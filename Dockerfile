@@ -25,4 +25,4 @@ RUN ./build_juceaide.sh
 COPY configure_audio_plugin.sh configure_audio_plugin.sh
 RUN ./configure_audio_plugin.sh
 COPY build_audio_plugin.sh build_audio_plugin.sh
-# RUN ./build_audio_plugin.sh
+RUN ./build_audio_plugin.sh
