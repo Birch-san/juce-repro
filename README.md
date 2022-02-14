@@ -1,6 +1,6 @@
 # Cross-compiling JUCE via llvm-mingw
 
-This repository showcases how to cross-compiling a JUCE audio plugin (on Linux, targeting Windows, using llvm-mingw).
+This repository showcases how to cross-compile a JUCE audio plugin (on Linux, targeting Windows, using llvm-mingw).
 
 By varying the build arguments, we can reproduce:
 
