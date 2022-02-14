@@ -1,11 +1,31 @@
-Example of cross-compiling a JUCE audio plugin (on Linux, targeting Windows, using llvm-mingw).
+# Cross-compiling JUCE via llvm-mingw
+
+This repository showcases how to cross-compiling a JUCE audio plugin (on Linux, targeting Windows, using llvm-mingw).
+
+By varying the build arguments, we can reproduce:
+
+- Working build
+- Failing build (https://github.com/juce-framework/JUCE/issues/1028)
+- Failing build (https://github.com/juce-framework/JUCE/issues/1029)
+
+## Working build
+
+If we revert to [llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/releases/tag/20211002), and target x86_64, it compiles just fine:
+
+```bash
+docker build --build-arg LLVM_MINGW_VER=20211002 .
+```
+
+## Failing build (https://github.com/juce-framework/JUCE/issues/1028)
+
+We can reproduce the failure to compile with recent [llvm-mingw 20220209](https://github.com/mstorsjo/llvm-mingw/releases/tag/20220209) (most recent release):
 
 
 ```bash
 docker build .
 ```
 
-This repository reproduces the problem that occurs when attempting to compile on [llvm-mingw 20220209](https://github.com/mstorsjo/llvm-mingw/releases/tag/20220209), namely a clash of defines on `juce_gui_basics.cpp`:
+i.e. a clash of defines on `juce_gui_basics.cpp`:
 
 ```
 In file included from /linux_native/include/JUCE-6.1.5/modules/juce_gui_basics/juce_gui_basics.cpp:309:
@@ -28,8 +48,26 @@ But the token `UIA_InvokePatternId` [already exists as a MinGW macro](https://gi
 const long (10000) = 10000;
 ```
 
-If we revert to [llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/releases/tag/20211002), it compiles just fine:
+## Failing build (https://github.com/juce-framework/JUCE/issues/1029)
+
+[llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/releases/tag/20211002) is trusted, but JUCE 6.1.5 encounters compile failure if we target x86 architecture:
 
 ```bash
-docker build --build-arg LLVM_MINGW_VER=20211002 .
+docker build --build-arg LLVM_MINGW_VER=20211002 --build-arg XARCH=i686 .
+```
+
+```
+In file included from /linux_native/include/JUCE-6.1.5/modules/juce_gui_basics/juce_gui_basics.cpp:309:
+/linux_native/include/JUCE-6.1.5/modules/juce_gui_basics/native/accessibility/juce_win32_ComInterfaces.h:179:1: error: class template specialization of 'UUIDGetter' not in a namespace enclosing 'juce'
+JUCE_COMCLASS (IRawElementProviderFragmentRoot, "620ce2a5-ab8f-40a9-86cb-de3c75599b58") : public IUnknown
+^
+/linux_native/include/JUCE-6.1.5/modules/juce_core/native/juce_win32_ComSmartPtr.h:45:5: note: expanded from macro 'JUCE_COMCLASS'
+    JUCE_DECLARE_UUID_GETTER (name, guid) \
+    ^
+/linux_native/include/JUCE-6.1.5/modules/juce_core/native/juce_win32_ComSmartPtr.h:41:24: note: expanded from macro 'JUCE_DECLARE_UUID_GETTER'
+    template <> struct UUIDGetter<name> { static CLSID get()  { return uuidFromString (uuid); } };
+                       ^
+/linux_native/include/JUCE-6.1.5/modules/juce_core/native/juce_win32_ComSmartPtr.h:31:34: note: explicitly specialized declaration is here
+ template <typename Type> struct UUIDGetter { static CLSID get() { jassertfalse; return {}; } };
+                                 ^
 ```
