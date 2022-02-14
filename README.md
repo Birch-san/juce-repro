@@ -5,8 +5,8 @@ This repository showcases how to cross-compiling a JUCE audio plugin (on Linux, 
 By varying the build arguments, we can reproduce:
 
 - Working build
-- Failing build (https://github.com/juce-framework/JUCE/issues/1028)
-- Failing build (https://github.com/juce-framework/JUCE/issues/1029)
+- Failing build ([#1028](https://github.com/juce-framework/JUCE/issues/1028))
+- Failing build ([#1029](https://github.com/juce-framework/JUCE/issues/1029))
 
 ## Working build
 
@@ -16,7 +16,7 @@ If we revert to [llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/rel
 docker build --build-arg LLVM_MINGW_VER=20211002 .
 ```
 
-## Failing build (https://github.com/juce-framework/JUCE/issues/1028)
+## Failing build ([#1028](https://github.com/juce-framework/JUCE/issues/1028))
 
 We can reproduce the failure to compile with recent [llvm-mingw 20220209](https://github.com/mstorsjo/llvm-mingw/releases/tag/20220209) (most recent release):
 
@@ -48,9 +48,9 @@ But the token `UIA_InvokePatternId` [already exists as a MinGW macro](https://gi
 const long (10000) = 10000;
 ```
 
-## Failing build (https://github.com/juce-framework/JUCE/issues/1029)
+## Failing build ([#1029](https://github.com/juce-framework/JUCE/issues/1029))
 
-[llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/releases/tag/20211002) is trusted, but JUCE 6.1.5 encounters compile failure if we target x86 architecture:
+[llvm-mingw 20211002](https://github.com/mstorsjo/llvm-mingw/releases/tag/20211002) is known-good, but JUCE 6.1.5 encounters compile failure if we target x86 architecture:
 
 ```bash
 docker build --build-arg LLVM_MINGW_VER=20211002 --build-arg XARCH=i686 .
